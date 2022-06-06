@@ -5,6 +5,9 @@ import (
 	"github.com/gonzispina/gokit/errors"
 )
 
+// ErrSerializationDoesNotExists ...
+var ErrSerializationDoesNotExists = errors.New("serialization does not exist", "SerializationNotFound")
+
 // UnexpectedEOF ...
 var UnexpectedEOFErr = errors.New("unexpected end of string", "UnexpectedEndOfString")
 
