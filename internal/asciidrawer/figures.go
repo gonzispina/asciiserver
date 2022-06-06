@@ -2,23 +2,23 @@ package asciidrawer
 
 // Figure contract
 type figure interface {
-	Draw(d Drawer, c *Canvas) error
-	Serialize(s Serializer) (string, error)
+	Draw(d Drawer, c *Canvas)
+	Serialize(s *serializer) string
 }
 
 // Rectangle representation
 type Rectangle struct {
 	vertex  vertex
-	height  uint8
-	width   uint8
-	Outline byte
-	Fill    byte
+	Height  int
+	Width   int
+	Outline string
+	Fill    string
 }
 
-func (r *Rectangle) Draw(d Drawer, c *Canvas) error {
-	return d.drawRectangle(c, r)
+func (r *Rectangle) Draw(d Drawer, c *Canvas) {
+	d.drawRectangle(c, r)
 }
 
-func (r *Rectangle) Serialize(s Serializer) string {
+func (r *Rectangle) Serialize(s *serializer) string {
 	return s.serializeRectangle(r)
 }
