@@ -50,7 +50,7 @@ func (a *App) Init() {
 	a.cases = factory.NewCasesFactory(a.repositories)
 	handlers := factory.NewHandlersFactory(a.cases, a.log)
 
-	installDrawings(context.Background(), a.repositories.CanvasStorage(), a.log)
+	installCanvases(context.Background(), a.repositories.CanvasStorage(), a.log)
 
 	a.mux = web.NewRouter(
 		handlers.CanvasHandler(),
@@ -73,10 +73,6 @@ func (a *App) Init() {
 }
 
 // Stop the application gracefully
-func (a *App) Stop(seconds time.Duration) {
+func (a *App) Stop() {
 	close(a.done)
-
-	if seconds != 0 {
-		time.Sleep(time.Second * seconds)
-	}
 }

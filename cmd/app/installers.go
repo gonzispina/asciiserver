@@ -7,7 +7,7 @@ import (
 	"github.com/gonzispina/gokit/logs"
 )
 
-func installDrawings(ctx context.Context, storage *repository.CanvasStorage, logger logs.Logger) {
+func installCanvases(ctx context.Context, storage *repository.CanvasStorage, logger logs.Logger) {
 	logger.Info(ctx, "Installing canvases...")
 
 	sr := &asciidrawer.Serialization{

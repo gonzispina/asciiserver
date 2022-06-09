@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/gonzispina/asciiserver/cmd/app"
-	"github.com/gonzispina/gokit/context"
 	"github.com/gonzispina/gokit/logs"
 )
 
@@ -32,6 +31,6 @@ func main() {
 
 	<-sigchan
 
-	logger.Info(context.Background(), "Shutting down application")
-	application.Stop(time.Second * 30)
+	application.Stop()
+	time.Sleep(time.Second * 15)
 }
