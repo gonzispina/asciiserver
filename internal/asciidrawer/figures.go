@@ -1,24 +1,35 @@
 package asciidrawer
 
+type FigureType int
+
+const (
+	// TypeRectangle FigureType
+	TypeRectangle FigureType = iota
+)
+
+type FigureVisitor interface {
+	visitRectangle(r *Rectangle)
+}
+
 // Figure contract
-type figure interface {
-	Draw(d Drawer, c *Canvas)
-	Serialize(s *serializer) string
+type Figure interface {
+	Accept(d FigureVisitor)
+	Type() FigureType
 }
 
 // Rectangle representation
 type Rectangle struct {
-	vertex  vertex
-	Height  int
-	Width   int
-	Outline string
-	Fill    string
+	Vertex  Vertex `bson:"vertex"`
+	Height  int    `bson:"height"`
+	Width   int    `bson:"width"`
+	Outline string `bson:"outline"`
+	Fill    string `bson:"fill"`
 }
 
-func (r *Rectangle) Draw(d Drawer, c *Canvas) {
-	d.drawRectangle(c, r)
+func (r *Rectangle) accept(f FigureVisitor) {
+	f.visitRectangle(r)
 }
 
-func (r *Rectangle) Serialize(s *serializer) string {
-	return s.serializeRectangle(r)
+func (r *Rectangle) Type() FigureType {
+	return TypeRectangle
 }

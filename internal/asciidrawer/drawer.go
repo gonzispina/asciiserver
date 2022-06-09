@@ -5,14 +5,14 @@ import (
 )
 
 type CanvasStorage interface {
-	SaveSerialization(ctx context.Context, serialization string) (string, error)
+	CreateSerialization(ctx context.Context, canvasSize int, figures []Figure) (*Serialization, error)
 	GetSerialization(ctx context.Context, id string) (*Serialization, error)
 }
 
 // Drawer use case
 type Drawer interface {
+	CreateDrawing(ctx context.Context, canvasSize int, figures []Figure) (*Serialization, error)
 	Draw(ctx context.Context, sID string) (*Canvas, error)
-	drawRectangle(canvas *Canvas, r *Rectangle)
 }
 
 // NewDrawer constructor
@@ -27,20 +27,8 @@ type drawer struct {
 	storage CanvasStorage
 }
 
-func (d *drawer) CreateDrawing(ctx context.Context, serialization string) (*Serialization, error) {
-	// First we validate the string
-	s, err := newSerializer(serialization).deserialize()
-	if err != nil {
-		return nil, err
-	}
-
-	id, err := d.storage.SaveSerialization(ctx, serialization)
-	if err != nil {
-		return nil, err
-	}
-
-	s.ID = id
-	return s, nil
+func (d *drawer) CreateDrawing(ctx context.Context, canvasSize int, figures []Figure) (*Serialization, error) {
+	return d.storage.CreateSerialization(ctx, canvasSize, figures)
 }
 
 func (d *drawer) Draw(ctx context.Context, sID string) (*Canvas, error) {
@@ -51,39 +39,8 @@ func (d *drawer) Draw(ctx context.Context, sID string) (*Canvas, error) {
 
 	canvas := newCanvas(s.CanvasSize)
 	for _, f := range s.Figures {
-		f.Draw(d, canvas)
+		f.Accept(canvas)
 	}
 
 	return canvas, nil
-}
-
-func (d *drawer) drawRectangle(c *Canvas, r *Rectangle) {
-	getChar := func(fr, lr, fc, lc bool) byte {
-		if r.Outline == "" {
-			return r.Fill[0]
-		}
-
-		if fr || lr || fc || lc {
-			return r.Outline[0]
-		}
-
-		if r.Fill == "" {
-			return " "[0]
-		}
-
-		return r.Fill[0]
-	}
-
-	for i := r.vertex.row; i < r.Height; i++ {
-		fr := i == r.vertex.row
-		lr := i == r.Height-1
-		for j := r.vertex.column; j < r.Width; j++ {
-			fc := j == r.vertex.column
-			lc := j == r.Width-1
-
-			c.Rows[j][i] = getChar(fr, lr, fc, lc)
-		}
-	}
-
-	return
 }
