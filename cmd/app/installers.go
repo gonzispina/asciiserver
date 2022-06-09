@@ -12,8 +12,8 @@ func installDrawings(ctx context.Context, storage *repository.CanvasStorage, log
 
 	sr := &asciidrawer.Serialization{
 		ID:           "62a22d7b8a95a01c6aedfb0f",
-		CanvasHeight: 21,
-		CanvasWidth:  8,
+		CanvasWidth:  21,
+		CanvasHeight: 8,
 		Figures: []asciidrawer.Figure{
 			&asciidrawer.Rectangle{
 				Vertex: asciidrawer.Vertex{
