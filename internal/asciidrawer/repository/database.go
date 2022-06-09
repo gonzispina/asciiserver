@@ -44,22 +44,27 @@ type CanvasStorage struct {
 	log    logs.Logger
 }
 
-// SaveSerialization saves a new serialization into the database
-func (s *CanvasStorage) SaveSerialization(ctx context.Context, serialization string) (string, error) {
+// CreateSerialization saves a new serialization into the database
+func (s *CanvasStorage) CreateSerialization(ctx context.Context, canvasSize int, figures []asciidrawer.Figure) (*asciidrawer.Serialization, error) {
 	hexID := primitive.NewObjectID()
 
 	insert := bson.D{
 		{Key: "_id", Value: hexID},
-		{Key: "str", Value: serialization},
+		{Key: "canvasSize", Value: canvasSize},
+		{Key: "figures", Value: mapFigures(figures)},
 	}
 
 	_, err := s.mongo.Collection(s.config.CollectionName).InsertOne(ctx, insert)
 	if err != nil {
 		s.log.Error(ctx, "Couldn't save serialization", logs.Error(err))
-		return "", err
+		return nil, err
 	}
 
-	return hexID.Hex(), nil
+	return &asciidrawer.Serialization{
+		ID:         hexID.Hex(),
+		CanvasSize: canvasSize,
+		Figures:    figures,
+	}, nil
 }
 
 func (s *CanvasStorage) GetSerialization(ctx context.Context, id string) (*asciidrawer.Serialization, error) {
@@ -75,14 +80,49 @@ func (s *CanvasStorage) GetSerialization(ctx context.Context, id string) (*ascii
 		if res.Err() == mongo.ErrNoDocuments {
 			return nil, asciidrawer.ErrSerializationDoesNotExists
 		}
-		s.log.Error(ctx, "Couldn't fetch the person from the db", logs.Error(err))
+		s.log.Error(ctx, "Couldn't fetch the serialization from the db", logs.Error(err))
 		return nil, err
 	}
 
-	sr := asciidrawer.Serialization{}
-	if err := res.Decode(&sr); err != nil {
-		s.log.Error(ctx, "Couldn't decode person", logs.Error(err))
+	b, err := res.DecodeBytes()
+	if err != nil {
+		s.log.Error(ctx, "Couldn't decode serialization bytes", logs.Error(err))
 		return nil, err
+	}
+
+	sr := asciidrawer.Serialization{
+		ID:         b.Lookup("_id").ObjectID().Hex(),
+		CanvasSize: int(b.Lookup("canvasSize").AsInt64()),
+		Figures:    []asciidrawer.Figure{},
+	}
+
+	elems, err := b.Lookup("figures").Array().Elements()
+	if err != nil {
+		s.log.Error(ctx, "Couldn't look up figures", logs.Error(err))
+		return nil, err
+	}
+
+	for _, elem := range elems {
+		var f asciidrawer.Figure
+
+		document := elem.Value().Document()
+		t := document.Lookup("type").AsInt64()
+
+		switch asciidrawer.FigureType(t) {
+		case asciidrawer.TypeRectangle:
+			f = &asciidrawer.Rectangle{}
+			break
+		default:
+			s.log.Warn(ctx, "Couldn't match database type")
+			continue
+		}
+
+		err := bson.Unmarshal(document.Lookup("data").Value, f)
+		if err != nil {
+			s.log.Error(ctx, "Couldn't unmarshal rectangle", logs.Error(err))
+			return nil, err
+		}
+		sr.Figures = append(sr.Figures, f)
 	}
 
 	return &sr, nil
