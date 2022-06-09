@@ -1,18 +1,19 @@
 package asciidrawer
 
 // newCanvas constructor
-func newCanvas(size int) *canvas {
-	rows := make([][]rune, size)
-	for i := 0; i < size; i++ {
-		rows[i] = make([]rune, size)
+func newCanvas(height, width int) *canvas {
+	rows := make([][]rune, height)
+	for i := 0; i < height; i++ {
+		rows[i] = make([]rune, width)
 	}
-	return &canvas{Size: size, Rows: rows}
+	return &canvas{Height: height, Width: width, Rows: rows}
 }
 
 // canvas representation. Is a square matrix where every position represents a character.
 type canvas struct {
-	Size int
-	Rows [][]rune
+	Height int
+	Width  int
+	Rows   [][]rune
 }
 
 func (c *canvas) String() string {
@@ -26,7 +27,7 @@ func (c *canvas) String() string {
 			str += string(c.Rows[i][j])
 		}
 
-		if i != c.Size-1 {
+		if i != c.Height-1 {
 			str += "\n"
 			continue
 		}

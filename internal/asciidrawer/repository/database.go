@@ -45,12 +45,13 @@ type CanvasStorage struct {
 }
 
 // CreateSerialization saves a new serialization into the database
-func (s *CanvasStorage) CreateSerialization(ctx context.Context, canvasSize int, figures []asciidrawer.Figure) (*asciidrawer.Serialization, error) {
+func (s *CanvasStorage) CreateSerialization(ctx context.Context, canvasHeight, canvasWidth int, figures []asciidrawer.Figure) (*asciidrawer.Serialization, error) {
 	hexID := primitive.NewObjectID()
 
 	insert := bson.D{
 		{Key: "_id", Value: hexID},
-		{Key: "canvasSize", Value: canvasSize},
+		{Key: "canvasHeight", Value: canvasHeight},
+		{Key: "canvasWidth", Value: canvasWidth},
 		{Key: "figures", Value: mapFigures(figures)},
 	}
 
@@ -61,9 +62,10 @@ func (s *CanvasStorage) CreateSerialization(ctx context.Context, canvasSize int,
 	}
 
 	return &asciidrawer.Serialization{
-		ID:         hexID.Hex(),
-		CanvasSize: canvasSize,
-		Figures:    figures,
+		ID:           hexID.Hex(),
+		CanvasHeight: canvasHeight,
+		CanvasWidth:  canvasWidth,
+		Figures:      figures,
 	}, nil
 }
 
@@ -91,9 +93,10 @@ func (s *CanvasStorage) GetSerialization(ctx context.Context, id string) (*ascii
 	}
 
 	sr := asciidrawer.Serialization{
-		ID:         b.Lookup("_id").ObjectID().Hex(),
-		CanvasSize: int(b.Lookup("canvasSize").AsInt64()),
-		Figures:    []asciidrawer.Figure{},
+		ID:           b.Lookup("_id").ObjectID().Hex(),
+		CanvasHeight: int(b.Lookup("canvasHeight").AsInt64()),
+		CanvasWidth:  int(b.Lookup("canvasWidth").AsInt64()),
+		Figures:      []asciidrawer.Figure{},
 	}
 
 	elems, err := b.Lookup("figures").Array().Elements()

@@ -20,8 +20,8 @@ func TestDrawer_CreateDrawing(t *testing.T) {
 	drawer := asciidrawer.NewDrawer(storage)
 
 	t.Run("Given we want to create a canvas", func(t *testing.T) {
-		canvasSize := 24
-
+		canvasWidth := 24
+		canvasHeight := 10
 		t.Run("When we create a rectangle", func(t *testing.T) {
 			t.Run("If we create a rectangle without fill and outline it returns an error", func(t *testing.T) {
 				r := &asciidrawer.Rectangle{
@@ -35,7 +35,7 @@ func TestDrawer_CreateDrawing(t *testing.T) {
 					Fill:    "",
 				}
 
-				_, err := drawer.CreateDrawing(ctx, canvasSize, []asciidrawer.Figure{r})
+				_, err := drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, []asciidrawer.Figure{r})
 				assert.True(t, errors.Is(err, asciidrawer.RecMustHaveFillOrOutlineErr))
 			})
 
@@ -51,20 +51,20 @@ func TestDrawer_CreateDrawing(t *testing.T) {
 					Fill:    "",
 				}
 
-				_, err := drawer.CreateDrawing(ctx, canvasSize, []asciidrawer.Figure{r})
+				_, err := drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, []asciidrawer.Figure{r})
 				assert.True(t, errors.Is(err, asciidrawer.RecOutOfSquare))
 
-				r.Vertex.Column = canvasSize
-				_, err = drawer.CreateDrawing(ctx, canvasSize, []asciidrawer.Figure{r})
+				r.Vertex.Column = canvasWidth
+				_, err = drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, []asciidrawer.Figure{r})
 				assert.True(t, errors.Is(err, asciidrawer.RecOutOfSquare))
 
 				r.Vertex.Column = 0
 				r.Vertex.Row = -1
-				_, err = drawer.CreateDrawing(ctx, canvasSize, []asciidrawer.Figure{r})
+				_, err = drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, []asciidrawer.Figure{r})
 				assert.True(t, errors.Is(err, asciidrawer.RecOutOfSquare))
 
-				r.Vertex.Row = canvasSize
-				_, err = drawer.CreateDrawing(ctx, canvasSize, []asciidrawer.Figure{r})
+				r.Vertex.Row = canvasHeight
+				_, err = drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, []asciidrawer.Figure{r})
 				assert.True(t, errors.Is(err, asciidrawer.RecOutOfSquare))
 			})
 
@@ -80,11 +80,11 @@ func TestDrawer_CreateDrawing(t *testing.T) {
 					Fill:    "A",
 				}
 
-				_, err := drawer.CreateDrawing(ctx, canvasSize, []asciidrawer.Figure{r})
+				_, err := drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, []asciidrawer.Figure{r})
 				assert.True(t, errors.Is(err, asciidrawer.NoDimRecErr))
 
 				r.Height = 0
-				_, err = drawer.CreateDrawing(ctx, canvasSize, []asciidrawer.Figure{r})
+				_, err = drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, []asciidrawer.Figure{r})
 				assert.True(t, errors.Is(err, asciidrawer.NoDimRecErr))
 			})
 
@@ -100,10 +100,11 @@ func TestDrawer_CreateDrawing(t *testing.T) {
 					Fill:    "A",
 				}
 
-				s, err := drawer.CreateDrawing(ctx, canvasSize, []asciidrawer.Figure{r})
+				s, err := drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, []asciidrawer.Figure{r})
 				assert.Nil(t, err)
 				assert.True(t, s.ID != "")
-				assert.Equal(t, canvasSize, s.CanvasSize)
+				assert.Equal(t, canvasWidth, s.CanvasWidth)
+				assert.Equal(t, canvasHeight, s.CanvasHeight)
 			})
 		})
 	})
@@ -123,7 +124,8 @@ func TestDrawer_Draw(t *testing.T) {
 
 		t.Run("When we draw squares", func(t *testing.T) {
 			t.Run("Ir doesn't fill squares without fill", func(t *testing.T) {
-				canvasSize := 3
+				canvasWidth := 3
+				canvasHeight := 4
 				f := []asciidrawer.Figure{
 					&asciidrawer.Rectangle{
 						Vertex: asciidrawer.Vertex{
@@ -140,9 +142,10 @@ func TestDrawer_Draw(t *testing.T) {
 				expected :=
 					"XXX\n" +
 						"X X\n" +
-						"XXX"
+						"XXX\n" +
+						"   "
 
-				s, err := drawer.CreateDrawing(ctx, canvasSize, f)
+				s, err := drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, f)
 				require.Nil(t, err)
 
 				got, err := drawer.Draw(ctx, s.ID)
@@ -152,7 +155,8 @@ func TestDrawer_Draw(t *testing.T) {
 			})
 
 			t.Run("It outlines with the fill when the outline char is not specified", func(t *testing.T) {
-				canvasSize := 5
+				canvasWidth := 5
+				canvasHeight := 4
 				f := []asciidrawer.Figure{
 					&asciidrawer.Rectangle{
 						Vertex: asciidrawer.Vertex{
@@ -170,10 +174,9 @@ func TestDrawer_Draw(t *testing.T) {
 					"OOOO \n" +
 						"OOOO \n" +
 						"OOOO \n" +
-						"OOOO \n" +
-						"     "
+						"OOOO "
 
-				s, err := drawer.CreateDrawing(ctx, canvasSize, f)
+				s, err := drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, f)
 				require.Nil(t, err)
 
 				got, err := drawer.Draw(ctx, s.ID)
@@ -183,7 +186,8 @@ func TestDrawer_Draw(t *testing.T) {
 			})
 
 			t.Run("It sets the fill and outline properly ", func(t *testing.T) {
-				canvasSize := 24
+				canvasWidth := 24
+				canvasHeight := 10
 				f := []asciidrawer.Figure{
 					&asciidrawer.Rectangle{
 						Vertex: asciidrawer.Vertex{
@@ -217,23 +221,9 @@ func TestDrawer_Draw(t *testing.T) {
 						"          XOOOOOOOOOOOOX\n" +
 						"          XOOOOOOOOOOOOX\n" +
 						"          XXXXXXXXXXXXXX\n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
-						"                        \n" +
 						"                        "
 
-				s, err := drawer.CreateDrawing(ctx, canvasSize, f)
+				s, err := drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, f)
 				require.Nil(t, err)
 
 				got, err := drawer.Draw(ctx, s.ID)
@@ -243,7 +233,8 @@ func TestDrawer_Draw(t *testing.T) {
 			})
 
 			t.Run("It overlaps the squares properly ", func(t *testing.T) {
-				canvasSize := 21
+				canvasWidth := 21
+				canvasHeight := 8
 				f := []asciidrawer.Figure{
 					&asciidrawer.Rectangle{
 						Vertex: asciidrawer.Vertex{
@@ -285,22 +276,9 @@ func TestDrawer_Draw(t *testing.T) {
 						"O      O      .......\n" +
 						"O    XXXXX    .......\n" +
 						"OOOOOXXXXX           \n" +
-						"     XXXXX           \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     \n" +
-						"                     "
+						"     XXXXX           "
 
-				s, err := drawer.CreateDrawing(ctx, canvasSize, f)
+				s, err := drawer.CreateDrawing(ctx, canvasHeight, canvasWidth, f)
 				require.Nil(t, err)
 
 				got, err := drawer.Draw(ctx, s.ID)

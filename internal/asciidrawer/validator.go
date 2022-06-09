@@ -2,13 +2,17 @@ package asciidrawer
 
 import "github.com/gonzispina/gokit/errors"
 
-func newValidator(canvasSize int) *validator {
-	return &validator{canvasSize: canvasSize}
+func newValidator(canvasHeight, canvasWidth int) *validator {
+	return &validator{
+		canvasHeight: canvasHeight,
+		canvasWidth:  canvasWidth,
+	}
 }
 
 type validator struct {
-	canvasSize int
-	err        error
+	canvasHeight int
+	canvasWidth  int
+	err          error
 }
 
 func (v *validator) addErr(err errors.Error) {
@@ -33,9 +37,9 @@ func (v *validator) visitRectangle(r *Rectangle) {
 	}
 
 	if r.Vertex.Column < 0 ||
-		r.Vertex.Column+r.Width > v.canvasSize ||
+		r.Vertex.Column+r.Width > v.canvasWidth ||
 		r.Vertex.Row < 0 ||
-		r.Vertex.Row+r.Height > v.canvasSize {
+		r.Vertex.Row+r.Height > v.canvasHeight {
 		v.addErr(RecOutOfSquare)
 	}
 }

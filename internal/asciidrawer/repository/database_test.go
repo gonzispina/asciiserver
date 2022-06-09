@@ -25,7 +25,8 @@ func TestCanvasStorage(t *testing.T) {
 		})
 
 		t.Run("When the canvas exists it returns the proper one", func(t *testing.T) {
-			canvasSize := 10
+			canvasHeight := 10
+			canvasWidth := 20
 			figures := []asciidrawer.Figure{
 				&asciidrawer.Rectangle{
 					Vertex: asciidrawer.Vertex{
@@ -49,14 +50,15 @@ func TestCanvasStorage(t *testing.T) {
 				},
 			}
 
-			s, err := storage.SaveSerialization(ctx, canvasSize, figures)
+			s, err := storage.CreateSerialization(ctx, canvasHeight, canvasWidth, figures)
 			require.Nil(t, err)
 
 			res, err := storage.GetSerialization(ctx, s.ID)
 			require.Nil(t, err)
 
 			assert.Equal(t, s.ID, res.ID)
-			assert.Equal(t, canvasSize, res.CanvasSize)
+			assert.Equal(t, canvasHeight, res.CanvasHeight)
+			assert.Equal(t, canvasWidth, res.CanvasWidth)
 			assert.Equal(t, figures, res.Figures)
 		})
 	})
