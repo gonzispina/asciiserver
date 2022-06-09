@@ -1,45 +1,64 @@
 package asciidrawer
 
 // newCanvas constructor
-func newCanvas(size int) *Canvas {
-	rows := make([][]byte, size)
+func newCanvas(size int) *canvas {
+	rows := make([][]rune, size)
 	for i := 0; i < size; i++ {
-		rows[i] = make([]uint8, size)
+		rows[i] = make([]rune, size)
 	}
-	return &Canvas{Size: size, Rows: rows}
+	return &canvas{Size: size, Rows: rows}
 }
 
-// Canvas representation. Is a square matrix where every position represents a character.
-type Canvas struct {
+// canvas representation. Is a square matrix where every position represents a character.
+type canvas struct {
 	Size int
-	Rows [][]byte
+	Rows [][]rune
 }
 
-func (c *Canvas) visitRectangle(r *Rectangle) {
-	getChar := func(fr, lr, fc, lc bool) byte {
+func (c *canvas) String() string {
+	str := ""
+	for i, row := range c.Rows {
+		for j, col := range row {
+			if string(col) == "\x00" {
+				c.Rows[i][j] = ' '
+			}
+
+			str += string(c.Rows[i][j])
+		}
+
+		if i != c.Size-1 {
+			str += "\n"
+			continue
+		}
+	}
+	return str
+}
+
+func (c *canvas) visitRectangle(r *Rectangle) {
+	getChar := func(fr, lr, fc, lc bool) rune {
 		if r.Outline == "" {
-			return r.Fill[0]
+			return rune(r.Fill[0])
 		}
 
 		if fr || lr || fc || lc {
-			return r.Outline[0]
+			return rune(r.Outline[0])
 		}
 
 		if r.Fill == "" {
-			return " "[0]
+			return ' '
 		}
 
-		return r.Fill[0]
+		return rune(r.Fill[0])
 	}
 
-	for i := r.Vertex.Row; i < r.Height; i++ {
+	for i := r.Vertex.Row; i < r.Vertex.Row+r.Height; i++ {
 		fr := i == r.Vertex.Row
-		lr := i == r.Height-1
-		for j := r.Vertex.Column; j < r.Width; j++ {
+		lr := i == r.Vertex.Row+r.Height-1
+		for j := r.Vertex.Column; j < r.Vertex.Column+r.Width; j++ {
 			fc := j == r.Vertex.Column
-			lc := j == r.Width-1
-
-			c.Rows[j][i] = getChar(fr, lr, fc, lc)
+			lc := j == r.Vertex.Column+r.Width-1
+			char := getChar(fr, lr, fc, lc)
+			c.Rows[i][j] = char
 		}
 	}
 

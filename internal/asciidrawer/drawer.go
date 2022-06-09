@@ -12,7 +12,7 @@ type CanvasStorage interface {
 // Drawer use case
 type Drawer interface {
 	CreateDrawing(ctx context.Context, canvasSize int, figures []Figure) (*Serialization, error)
-	Draw(ctx context.Context, sID string) (*Canvas, error)
+	Draw(ctx context.Context, sID string) (string, error)
 }
 
 // NewDrawer constructor
@@ -28,19 +28,28 @@ type drawer struct {
 }
 
 func (d *drawer) CreateDrawing(ctx context.Context, canvasSize int, figures []Figure) (*Serialization, error) {
-	return d.storage.CreateSerialization(ctx, canvasSize, figures)
-}
+	v := newValidator(canvasSize)
+	for _, f := range figures {
+		f.accept(v)
+	}
 
-func (d *drawer) Draw(ctx context.Context, sID string) (*Canvas, error) {
-	s, err := d.storage.GetSerialization(ctx, sID)
-	if err != nil {
+	if err := v.Err(); err != nil {
 		return nil, err
 	}
 
-	canvas := newCanvas(s.CanvasSize)
-	for _, f := range s.Figures {
-		f.Accept(canvas)
+	return d.storage.CreateSerialization(ctx, canvasSize, figures)
+}
+
+func (d *drawer) Draw(ctx context.Context, sID string) (string, error) {
+	s, err := d.storage.GetSerialization(ctx, sID)
+	if err != nil {
+		return "", err
 	}
 
-	return canvas, nil
+	c := newCanvas(s.CanvasSize)
+	for _, f := range s.Figures {
+		f.accept(c)
+	}
+
+	return c.String(), nil
 }

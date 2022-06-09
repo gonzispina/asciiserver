@@ -32,13 +32,10 @@ func (v *validator) visitRectangle(r *Rectangle) {
 		v.addErr(NoDimRecErr)
 	}
 
-	switch {
-	case r.Vertex.Column < 1:
-	case r.Vertex.Column >= v.canvasSize:
-	case r.Vertex.Column+r.Width >= v.canvasSize:
-	case r.Vertex.Row < 1:
-	case r.Vertex.Row >= v.canvasSize:
-	case r.Vertex.Row+r.Height >= v.canvasSize:
+	if r.Vertex.Column < 0 ||
+		r.Vertex.Column+r.Width > v.canvasSize ||
+		r.Vertex.Row < 0 ||
+		r.Vertex.Row+r.Height > v.canvasSize {
 		v.addErr(RecOutOfSquare)
 	}
 }

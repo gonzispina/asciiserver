@@ -13,7 +13,7 @@ type FigureVisitor interface {
 
 // Figure contract
 type Figure interface {
-	Accept(d FigureVisitor)
+	accept(d FigureVisitor)
 	Type() FigureType
 }
 
