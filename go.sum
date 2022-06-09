@@ -22,6 +22,8 @@ github.com/gonzispina/gokit v0.0.1 h1:ZhNqg49k5+EJo+GS48BFQvu6wAd3rn8okvcERz6dcC
 github.com/gonzispina/gokit v0.0.1/go.mod h1:Who/KtgXkYWATsVLrSBWviXDonHiPt1uV9w6/PyXxcw=
 github.com/gonzispina/gokit v0.0.2 h1:c15vBg6NX9lqcdCSFuxXpqoweD5U/oC+02CjbVLuImM=
 github.com/gonzispina/gokit v0.0.2/go.mod h1:xpgU8NJgoLCU1zmRFe6+lxqyUnYhdLActQa9NvXFnis=
+github.com/gonzispina/gokit v0.0.3 h1:D0NtuSMVQ9f6c6VIOMEEgH2TXE7hJtYXar0LY5re8wE=
+github.com/gonzispina/gokit v0.0.3/go.mod h1:EJm26jQlFfGfcUY4+Om+Kmrm7qwpIoRfFZtAcvRtcf0=
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/uuid v1.3.0 h1:t6JiXgmwXMjEs8VusXIJk2BXHsn+wx8BZdTaoZ5fu7I=
 github.com/google/uuid v1.3.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=

@@ -1,7 +1,7 @@
 package factory
 
 import (
-	"github.com/gonzispina/asciiserver/src/app/web"
+	"github.com/gonzispina/asciiserver/cmd/app/web"
 	"github.com/gonzispina/gokit/logs"
 )
 

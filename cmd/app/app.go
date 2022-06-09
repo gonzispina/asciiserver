@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/gonzispina/asciiserver/src/app/web"
-	"github.com/gonzispina/asciiserver/src/factory"
+	"github.com/gonzispina/asciiserver/cmd/app/web"
+	"github.com/gonzispina/asciiserver/cmd/factory"
 	"github.com/gonzispina/gokit/context"
 	"github.com/gonzispina/gokit/logs"
 	"github.com/gonzispina/gokit/mongo"
@@ -49,6 +49,8 @@ func (a *App) Init() {
 	a.repositories = factory.NewRepositoriesFactory(a.mongo, a.log)
 	a.cases = factory.NewCasesFactory(a.repositories)
 	handlers := factory.NewHandlersFactory(a.cases, a.log)
+
+	installDrawings(context.Background(), a.repositories.CanvasStorage(), a.log)
 
 	a.mux = web.NewRouter(
 		handlers.CanvasHandler(),

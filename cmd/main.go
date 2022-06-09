@@ -6,7 +6,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gonzispina/asciiserver/src/app"
+	"github.com/gonzispina/asciiserver/cmd/app"
 )
 
 var (

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"github.com/gonzispina/gokit/context"
 	"github.com/gonzispina/gokit/logs"
 	"net/http"
@@ -19,6 +20,7 @@ func InitializeServer(ctx context.Context, port string, mux http.Handler, logger
 	}
 
 	go func() {
+		logger.Info(ctx, fmt.Sprintf("Starting server on port %s...", port))
 		err := s.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			panic("Could not initialize server " + err.Error())
@@ -44,4 +46,3 @@ func InitializeServer(ctx context.Context, port string, mux http.Handler, logger
 
 	return cancel
 }
-

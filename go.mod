@@ -2,10 +2,11 @@ module github.com/gonzispina/asciiserver
 
 go 1.18
 
+require github.com/gonzispina/gokit v0.0.3
+
 require (
-	github.com/go-chi/chi v1.5.4 // indirect
-	github.com/gonzispina/gokit v0.0.2
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/go-chi/chi v1.5.4 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.11.0 // indirect

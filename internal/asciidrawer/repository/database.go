@@ -7,6 +7,7 @@ import (
 	"github.com/gonzispina/gokit/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func DefaultDatabaseConfig() *DatabaseConfig {
@@ -42,6 +43,25 @@ type CanvasStorage struct {
 	config *DatabaseConfig
 	mongo  *mongo.Mongo
 	log    logs.Logger
+}
+
+// SaveSerialization save an existing serialization
+func (s *CanvasStorage) SaveSerialization(ctx context.Context, sr *asciidrawer.Serialization) error {
+	hexID, _ := primitive.ObjectIDFromHex(sr.ID)
+	filter := bson.M{"_id": hexID}
+	update := bson.D{
+		{Key: "_id", Value: hexID},
+		{Key: "canvasHeight", Value: sr.CanvasHeight},
+		{Key: "canvasWidth", Value: sr.CanvasWidth},
+		{Key: "figures", Value: mapFigures(sr.Figures)},
+	}
+	opts := options.Update().SetUpsert(true)
+	_, err := s.mongo.Collection(s.config.CollectionName).UpdateOne(ctx, filter, bson.M{"$set": update}, opts)
+	if err != nil {
+		s.log.Error(ctx, "Couldn't save serialization", logs.Error(err))
+		return err
+	}
+	return nil
 }
 
 // CreateSerialization saves a new serialization into the database
