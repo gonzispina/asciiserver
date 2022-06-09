@@ -11,8 +11,8 @@ import (
 )
 
 // New application
-func New() *App {
-	return &App{log: logs.InitDefault()}
+func New(logger logs.Logger) *App {
+	return &App{log: logger}
 }
 
 // App ...
@@ -64,6 +64,7 @@ func (a *App) Init() {
 	go func() {
 		<-a.done
 
+		a.log.Info(ctx, "Stopping server...")
 		stopServer()
 
 		ctx, _ = context.WithTimeout(context.Background(), time.Second*10)

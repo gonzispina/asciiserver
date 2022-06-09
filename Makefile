@@ -6,5 +6,11 @@ VERSION=0.1.0
 LDFLAGS=-ldflags "-X main.Version=${VERSION}"
 
 # Build step, generates the binary.
-build:
+run:
+	@docker-compose up -d
 	@go build ${LDFLAGS} -o ${BINARY} cmd/*.go
+	@./bin/asciiserver
+
+# Run the test for all the directories.
+test:
+	@go test -v ./...

@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/gonzispina/asciiserver/cmd/app"
+	"github.com/gonzispina/gokit/context"
+	"github.com/gonzispina/gokit/logs"
 )
 
 var (
@@ -19,11 +21,9 @@ var (
 )
 
 func main() {
-	application := app.New()
+	logger := logs.InitDefault()
+	application := app.New(logger)
 	application.Init()
-
-	// Gracefully shutdown
-	defer application.Stop(time.Second * 30)
 
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, SIGINT)
@@ -31,4 +31,7 @@ func main() {
 	signal.Notify(sigchan, SIGTSTP)
 
 	<-sigchan
+
+	logger.Info(context.Background(), "Shutting down application")
+	application.Stop(time.Second * 30)
 }
